@@ -1,0 +1,17 @@
+{
+  "manifest_version": 3,
+  "name": "jobwire",
+  "version": "0.1.0",
+  "description": "Re-angle your existing resume to the job posting you are looking at, locally, without inventing anything.",
+  "permissions": ["activeTab", "scripting", "storage", "downloads"],
+  "host_permissions": ["http://127.0.0.1:7788/*", "http://localhost:7788/*"],
+  "background": { "service_worker": "background.js" },
+  "action": { "default_title": "Tailor my resume to this job" },
+  "options_page": "options.html",
+  "web_accessible_resources": [
+    {
+      "resources": ["preview.html", "preview.js", "fonts/*"],
+      "matches": ["<all_urls>"]
+    }
+  ]
+}

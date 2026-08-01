@@ -1,0 +1,22 @@
+{
+  "name": "jobwire",
+  "version": "0.1.0",
+  "main": "server/index.js",
+  "scripts": {
+    "start": "node server/index.js",
+    "dev": "node --watch server/index.js",
+    "build": "rm -f jobwire-extension.zip && zip -r jobwire-extension.zip extension",
+    "setup": "node server/index.js",
+    "test": "node --test test/",
+    "import": "node server/pdf-import.js",
+    "check": "bash tools/build-check.sh"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "description": "Re-angle your existing resume to a job posting, locally, without inventing anything.",
+  "dependencies": {
+    "pdfjs-dist": "^3.11.174"
+  },
+  "private": true
+}

@@ -1,0 +1,185 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>jobwire setup</title>
+  <style>
+    body { font: 14px/1.6 ui-sans-serif, system-ui, -apple-system, sans-serif; margin: 0; color: #111; background: #f6f7f9; }
+    .bar { background: #111827; color: #fff; padding: 12px 20px; display: flex; align-items: center; gap: 14px; }
+    .bar b { font-size: 15px; }
+    .bar span { color: #9ca3af; font-size: 13px; }
+    .wrap { display: flex; gap: 18px; padding: 18px; align-items: flex-start; }
+    .col { flex: 1; min-width: 0; }
+    .card { background: #fff; border-radius: 10px; padding: 16px 18px; margin-bottom: 14px; box-shadow: 0 1px 3px rgba(0,0,0,.08); }
+    h2 { font-size: 12px; text-transform: uppercase; letter-spacing: .06em; color: #6b7280; margin: 0 0 10px; }
+    input[type=file] { font: inherit; }
+    button { background: #111827; color: #fff; border: 0; border-radius: 7px; padding: 9px 15px; font-weight: 600; cursor: pointer; font-size: 13px; }
+    button.ghost { background: #f3f4f6; color: #111; }
+    button:disabled { opacity: .45; cursor: default; }
+    textarea { width: 100%; font: 13px/1.5 ui-sans-serif, system-ui, sans-serif; border: 1px solid #d1d5db; border-radius: 6px; padding: 7px 9px; resize: vertical; }
+    .lbl { font-size: 11px; color: #6b7280; margin: 10px 0 3px; font-weight: 600; }
+    .warn { background: #fef3c7; color: #92400e; border-radius: 7px; padding: 10px 12px; font-size: 12.5px; margin-bottom: 8px; line-height: 1.5; }
+    .ok { background: #dcfce7; color: #14532d; border-radius: 7px; padding: 10px 12px; font-size: 13px; }
+    iframe { width: 100%; height: 1123px; border: 0; background: #fff; box-shadow: 0 1px 3px rgba(0,0,0,.15); }
+    .frame-wrap { background: #71757c; padding: 10px; border-radius: 10px; overflow: auto; }
+    #msg { font-size: 13px; margin-left: auto; }
+    .two { display: flex; gap: 8px; }
+    .two > * { flex: 1; }
+  </style>
+</head>
+<body>
+  <div class="bar">
+    <b>jobwire</b>
+    <span>one-time setup — import your resume, fix anything the parser got wrong</span>
+    <div id="msg"></div>
+  </div>
+
+  <div class="wrap">
+    <div class="col">
+      <div class="card">
+        <h2>1 · Import your resume PDF</h2>
+        <input type="file" id="file" accept="application/pdf">
+        <div class="lbl" style="margin-top:10px">This reads the text and layout. It never uploads anywhere.</div>
+      </div>
+
+      <div class="card" id="warnCard" hidden>
+        <h2>2 · Check these lines</h2>
+        <div id="warns"></div>
+      </div>
+
+      <div class="card" id="editCard" hidden>
+        <h2>3 · Your facts</h2>
+        <div id="editor"></div>
+        <div class="two" style="margin-top:14px">
+          <button id="save">Save as my resume</button>
+          <button id="refresh" class="ghost">Refresh preview</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="col">
+      <div class="card" style="padding:10px">
+        <h2 style="margin-left:8px">Preview</h2>
+        <div class="frame-wrap"><iframe id="preview"></iframe></div>
+      </div>
+    </div>
+  </div>
+
+<script>
+const $ = (id) => document.getElementById(id);
+let facts = null;
+
+const msg = (t, good) => { $('msg').textContent = t; $('msg').style.color = good === false ? '#fca5a5' : '#86efac'; };
+
+function field(label, value, onInput, rows) {
+  const wrap = document.createElement('div');
+  const l = document.createElement('div');
+  l.className = 'lbl';
+  l.textContent = label;
+  const ta = document.createElement('textarea');
+  ta.rows = rows || 2;
+  ta.value = value || '';
+  ta.oninput = () => onInput(ta.value);
+  wrap.append(l, ta);
+  return wrap;
+}
+
+function buildEditor() {
+  const box = $('editor');
+  box.innerHTML = '';
+
+  box.append(field('Name', facts.name, (v) => { facts.name = v; }, 1));
+  if (facts.summary) {
+    box.append(field('Summary', facts.summary.text, (v) => { facts.summary.text = v; }, 3));
+  }
+
+  for (const e of facts.experience || []) {
+    box.append(field(`${e.org} — ${e.role}`, e.bullets.map((b) => b.text).join('\n'),
+      (v) => {
+        const lines = v.split('\n').map((s) => s.trim()).filter(Boolean);
+        e.bullets = lines.map((text, i) => ({ id: (e.bullets[i] && e.bullets[i].id) || `${e.id}-b${i}`, text }));
+      }, Math.max(3, e.bullets.length + 1)));
+  }
+
+  for (const p of facts.projects || []) {
+    box.append(field(`${p.name} (${p.stack})`, p.bullets.map((b) => b.text).join('\n'),
+      (v) => {
+        const lines = v.split('\n').map((s) => s.trim()).filter(Boolean);
+        p.bullets = lines.map((text, i) => ({ id: (p.bullets[i] && p.bullets[i].id) || `${p.id}-b${i}`, text }));
+      }, Math.max(3, p.bullets.length + 1)));
+  }
+
+  for (const s of facts.skills || []) {
+    box.append(field(s.label, (s.items || []).join(', '),
+      (v) => { s.items = v.split(',').map((x) => x.trim()).filter(Boolean); }, 2));
+  }
+}
+
+function showWarnings() {
+  const w = facts.warnings || [];
+  if (!w.length) { $('warnCard').hidden = true; return; }
+  $('warnCard').hidden = false;
+  $('warns').innerHTML = '';
+  const note = document.createElement('div');
+  note.className = 'warn';
+  note.innerHTML = '<b>Line breaks with hyphens are ambiguous.</b> LaTeX writes a hyphen both when it splits a word and when the word really has one. Check these below and fix any that look wrong (e.g. "writeconfirmation" should be "write-confirmation").';
+  $('warns').append(note);
+  for (const x of w) {
+    const d = document.createElement('div');
+    d.className = 'warn';
+    d.textContent = x.resolved.slice(0, 160);
+    $('warns').append(d);
+  }
+}
+
+async function preview() {
+  const r = await fetch('/preview', {
+    method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify(facts),
+  });
+  $('preview').srcdoc = await r.text();
+}
+
+$('file').onchange = async (e) => {
+  const f = e.target.files[0];
+  if (!f) return;
+  msg('reading…');
+  const b64 = await new Promise((res) => {
+    const fr = new FileReader();
+    fr.onload = () => res(String(fr.result).split(',')[1]);
+    fr.readAsDataURL(f);
+  });
+  const r = await fetch('/import', {
+    method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ pdfBase64: b64 }),
+  });
+  if (!r.ok) { msg('import failed: ' + (await r.text()), false); return; }
+  facts = await r.json();
+  $('editCard').hidden = false;
+  buildEditor();
+  showWarnings();
+  await preview();
+  msg('imported — check it, then save');
+};
+
+$('refresh').onclick = preview;
+
+$('save').onclick = async () => {
+  const r = await fetch('/facts', {
+    method: 'PUT', headers: { 'content-type': 'application/json' }, body: JSON.stringify(facts),
+  });
+  msg(r.ok ? 'saved — you can close this and use the extension' : 'save failed', r.ok);
+  if (r.ok) preview();
+};
+
+// If a resume was already imported, load it so this page doubles as an editor.
+fetch('/facts').then((r) => (r.ok ? r.json() : null)).then((f) => {
+  if (!f) return;
+  facts = f;
+  $('editCard').hidden = false;
+  buildEditor();
+  showWarnings();
+  preview();
+  msg('loaded your saved resume');
+});
+</script>
+</body>
+</html>
