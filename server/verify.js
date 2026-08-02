@@ -122,6 +122,9 @@ const MIN_OVERLAP = 0.34;
 
 function checkBullet(out, facts, vocab, sources) {
   const issues = [];
+  if (out.id && sources.has(out.id) && out.text === sources.get(out.id)) {
+    return [];
+  }
   const src = out.from ? sources.get(out.from) : null;
   if (!out.from) {
     issues.push({ level: 'reject', kind: 'no-citation', detail: 'bullet cites no source fact' });
@@ -163,7 +166,7 @@ function verifyRun(run, facts) {
     const fatal = issues.filter((i) => i.level === 'reject');
     const flags = issues.filter((i) => i.level === 'flag');
     if (fatal.length) {
-      const original = sources.get(b.from) || restoreFrom(b);
+      const original = sources.get(b.from) || sources.get(b.id) || restoreFrom(b);
       report.rejected.push({ id: b.id, text: b.text, issues: fatal, restored: original });
       return original ? { ...b, text: original, reverted: true } : null;
     }

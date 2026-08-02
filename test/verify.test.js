@@ -5,7 +5,36 @@ const path = require('path');
 
 const { verifyRun, unattested, buildVocab, overlapRatio } = require('../server/verify.js');
 
-const facts = JSON.parse(fs.readFileSync(path.join(__dirname, '..', 'data', 'facts.json'), 'utf8'));
+const mockFacts = {
+  name: "VIGNESHWARAN B",
+  summary: {
+    id: "s-1",
+    text: "Software Engineer with experience building SaaS apps. Used RabbitMQ Qdrant FastAPI Docker and MongoDB. Integrated FHIR EHR APIs with Azure Blob Storage over SFTP. Voice AI agent timelines."
+  },
+  experience: [
+    {
+      id: "e-2",
+      org: "Voxy India Private Limited",
+      dates: "October 2025 – Present",
+      role: "SDE Full time",
+      bullets: [
+        {
+          id: "b-3",
+          text: "Designed transcript reconciliation workflows to merge AI and human conversation streams into consistent production records."
+        }
+      ]
+    }
+  ],
+  skills: [
+    {
+      id: "k-18",
+      label: "Backend",
+      items: ["RAG", "RabbitMQ", "Qdrant", "FastAPI", "Docker", "MongoDB", "FHIR", "EHR", "Azure", "Blob", "Storage", "SFTP", "AWS"]
+    }
+  ]
+};
+
+const facts = mockFacts;
 const vocab = buildVocab(facts);
 
 const clone = (o) => JSON.parse(JSON.stringify(o));
