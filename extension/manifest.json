@@ -1,6 +1,6 @@
 {
   "manifest_version": 3,
-  "name": "jobwire",
+  "name": "fast-CV",
   "version": "0.1.0",
   "description": "Re-angle your existing resume to the job posting you are looking at, locally, without inventing anything.",
   "permissions": ["activeTab", "scripting", "storage", "downloads"],

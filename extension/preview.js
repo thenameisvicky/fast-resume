@@ -85,7 +85,7 @@
       }
       fit();
     } catch (e) {
-      fail(`cannot reach the jobwire server at ${base} — ${e.message}`);
+      fail(`cannot reach the fast-CV server at ${base} — ${e.message}`);
     }
   }
 
@@ -136,6 +136,39 @@
       parent.postMessage({ type: 'jw-edits', edits }, '*');
     }
     if (m.type === 'jw-reload') load();
+    if (m.type === 'jw-update') {
+      const parts = m.parts;
+      run = m.run || run;
+      ladder = parts.ladder;
+      availPt = parts.availPt;
+
+      document.querySelectorAll('style[data-jw]').forEach((n) => n.remove());
+      const style = document.createElement('style');
+      style.setAttribute('data-jw', '1');
+      style.textContent = parts.css;
+      document.head.appendChild(style);
+
+      const old = document.getElementById('jw-page');
+      if (old) old.remove();
+      const page = document.createElement('div');
+      page.className = 'page';
+      page.id = 'jw-page';
+      page.innerHTML = parts.body;
+      document.body.appendChild(page);
+
+      markFlags(parts.verification);
+
+      if (document.fonts && document.fonts.load) {
+        Promise.all([
+          document.fonts.load("10.9pt 'LMRoman10'"),
+          document.fonts.load("bold 10.9pt 'LMRoman10'"),
+          document.fonts.load("italic 10.9pt 'LMRoman10'"),
+          document.fonts.load("bold 17pt 'LMRoman12'"),
+        ]).then(fit);
+      } else {
+        fit();
+      }
+    }
   });
 
   // Re-fit as you type, so overflow shows up while you can still fix it.
@@ -146,5 +179,7 @@
   });
 
   if (!runId) fail('no run id');
-  else load();
+  else if (runId === 'stream') {
+    // Just wait for jw-update messages.
+  } else load();
 })();

@@ -20,10 +20,21 @@ $('check').onclick = async () => {
     const h = await r.json();
     const bits = [];
     bits.push(h.hasFacts ? `resume loaded (${h.factsName})` : 'no resume imported yet — open the setup page');
-    if (!h.ollama.ok) bits.push('Ollama not reachable — run: ollama serve');
-    else if (!h.ollama.present) bits.push(`model ${h.ollama.using} missing — run: ollama pull ${h.ollama.using}`);
-    else bits.push(`Ollama ready (${h.ollama.using})`);
-    msg(bits.join(' · '), h.hasFacts && h.ollama.ok && h.ollama.present ? 'ok' : 'bad');
+    
+    let modelOk = false;
+    if (h.ollama && h.ollama.isGemini) {
+      bits.push(`Gemini ready (${h.ollama.using})`);
+      modelOk = true;
+    } else if (h.ollama) {
+      if (!h.ollama.ok) bits.push('Ollama not reachable — run: ollama serve');
+      else if (!h.ollama.present) bits.push(`model ${h.ollama.using} missing — run: ollama pull ${h.ollama.using}`);
+      else {
+        bits.push(`Ollama ready (${h.ollama.using})`);
+        modelOk = true;
+      }
+    }
+    
+    msg(bits.join(' · '), h.hasFacts && modelOk ? 'ok' : 'bad');
   } catch (e) {
     msg(`cannot reach ${url} — is the server running?`, 'bad');
   }

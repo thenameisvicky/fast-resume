@@ -1,11 +1,11 @@
 {
-  "name": "jobwire",
+  "name": "fast-cv",
   "version": "0.1.0",
   "main": "server/index.js",
   "scripts": {
     "start": "node server/index.js",
     "dev": "node --watch server/index.js",
-    "build": "rm -f jobwire-extension.zip && zip -r jobwire-extension.zip extension",
+    "build": "rm -f fast-cv-extension.zip && zip -r fast-cv-extension.zip extension",
     "setup": "node server/index.js",
     "test": "node --test test/",
     "import": "node server/pdf-import.js",

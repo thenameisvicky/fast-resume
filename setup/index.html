@@ -2,34 +2,37 @@
 <html>
 <head>
   <meta charset="utf-8">
-  <title>jobwire setup</title>
+  <title>fast-CV setup</title>
   <style>
-    body { font: 14px/1.6 ui-sans-serif, system-ui, -apple-system, sans-serif; margin: 0; color: #111; background: #f6f7f9; }
-    .bar { background: #111827; color: #fff; padding: 12px 20px; display: flex; align-items: center; gap: 14px; }
-    .bar b { font-size: 15px; }
-    .bar span { color: #9ca3af; font-size: 13px; }
-    .wrap { display: flex; gap: 18px; padding: 18px; align-items: flex-start; }
+    body { font: 14px/1.6 ui-sans-serif, system-ui, -apple-system, sans-serif; margin: 0; color: #000; background: #fff; }
+    .bar { background: #000; color: #fff; padding: 16px 24px; display: flex; align-items: center; gap: 14px; border-bottom: 1px solid #000; }
+    .bar b { font-size: 15px; text-transform: uppercase; letter-spacing: 0.05em; }
+    .bar span { color: #888; font-size: 12px; }
+    .wrap { display: flex; gap: 24px; padding: 24px; align-items: flex-start; }
     .col { flex: 1; min-width: 0; }
-    .card { background: #fff; border-radius: 10px; padding: 16px 18px; margin-bottom: 14px; box-shadow: 0 1px 3px rgba(0,0,0,.08); }
-    h2 { font-size: 12px; text-transform: uppercase; letter-spacing: .06em; color: #6b7280; margin: 0 0 10px; }
+    .card { background: #fff; border: 1px solid #000; border-radius: 0; padding: 20px; margin-bottom: 20px; box-shadow: none; }
+    h2 { font-size: 11px; text-transform: uppercase; letter-spacing: .08em; color: #000; margin: 0 0 16px; font-weight: 700; }
     input[type=file] { font: inherit; }
-    button { background: #111827; color: #fff; border: 0; border-radius: 7px; padding: 9px 15px; font-weight: 600; cursor: pointer; font-size: 13px; }
-    button.ghost { background: #f3f4f6; color: #111; }
-    button:disabled { opacity: .45; cursor: default; }
-    textarea { width: 100%; font: 13px/1.5 ui-sans-serif, system-ui, sans-serif; border: 1px solid #d1d5db; border-radius: 6px; padding: 7px 9px; resize: vertical; }
-    .lbl { font-size: 11px; color: #6b7280; margin: 10px 0 3px; font-weight: 600; }
-    .warn { background: #fef3c7; color: #92400e; border-radius: 7px; padding: 10px 12px; font-size: 12.5px; margin-bottom: 8px; line-height: 1.5; }
-    .ok { background: #dcfce7; color: #14532d; border-radius: 7px; padding: 10px 12px; font-size: 13px; }
-    iframe { width: 100%; height: 1123px; border: 0; background: #fff; box-shadow: 0 1px 3px rgba(0,0,0,.15); }
-    .frame-wrap { background: #71757c; padding: 10px; border-radius: 10px; overflow: auto; }
-    #msg { font-size: 13px; margin-left: auto; }
-    .two { display: flex; gap: 8px; }
+    button { background: #000; color: #fff; border: 1px solid #000; border-radius: 0; padding: 9px 15px; font-weight: 600; cursor: pointer; font-size: 11px; text-transform: uppercase; letter-spacing: 0.05em; transition: all 0.2s; }
+    button:hover { background: #fff; color: #000; }
+    button.ghost { background: #fff; color: #000; border: 1px solid #000; }
+    button.ghost:hover { background: #000; color: #fff; }
+    button:disabled { opacity: .35; cursor: default; }
+    textarea { width: 100%; font: 13px/1.5 ui-sans-serif, system-ui, sans-serif; border: 1px solid #000; border-radius: 0; padding: 8px 10px; resize: vertical; box-sizing: border-box; background: #fff; color: #000; }
+    textarea:focus { outline: none; }
+    .lbl { font-size: 10px; text-transform: uppercase; letter-spacing: 0.05em; color: #666; margin: 12px 0 4px; font-weight: 700; }
+    .warn { background: #fff; color: #000; border: 1px solid #000; border-left: 4px solid #000; border-radius: 0; padding: 10px 12px; font-size: 12px; margin-bottom: 8px; line-height: 1.5; }
+    .ok { background: #fff; color: #000; border: 1px solid #ccc; border-left: 4px solid #ccc; border-radius: 0; padding: 10px 12px; font-size: 12.5px; }
+    iframe { width: 100%; height: 1123px; border: 1px solid #000; background: #fff; box-shadow: none; }
+    .frame-wrap { background: #111; padding: 20px; border-radius: 0; overflow: auto; border: 1px solid #000; }
+    #msg { font-size: 12px; margin-left: auto; text-transform: uppercase; font-weight: 700; letter-spacing: 0.05em; }
+    .two { display: flex; gap: 12px; }
     .two > * { flex: 1; }
   </style>
 </head>
 <body>
   <div class="bar">
-    <b>jobwire</b>
+    <b>fast-CV</b>
     <span>one-time setup — import your resume, fix anything the parser got wrong</span>
     <div id="msg"></div>
   </div>
@@ -69,7 +72,17 @@
 const $ = (id) => document.getElementById(id);
 let facts = null;
 
-const msg = (t, good) => { $('msg').textContent = t; $('msg').style.color = good === false ? '#fca5a5' : '#86efac'; };
+const msg = (t, good) => { 
+  $('msg').textContent = t; 
+  $('msg').style.color = good === false ? '#ff3b30' : '#000';
+  if (good !== false) {
+    $('msg').style.background = '#fff';
+    $('msg').style.color = '#000';
+    $('msg').style.padding = '3px 8px';
+  } else {
+    $('msg').style.background = 'transparent';
+  }
+};
 
 function field(label, value, onInput, rows) {
   const wrap = document.createElement('div');
@@ -179,6 +192,34 @@ fetch('/facts').then((r) => (r.ok ? r.json() : null)).then((f) => {
   showWarnings();
   preview();
   msg('loaded your saved resume');
+});
+
+// Fetch backend model health status and display badge
+fetch('/health').then((r) => r.json()).then((h) => {
+  const modelInfo = h.ollama.isGemini ? `Gemini (${h.ollama.using})` : `Ollama (${h.ollama.using})`;
+  const statusEl = document.createElement('span');
+  statusEl.style.marginLeft = '12px';
+  statusEl.style.fontSize = '10px';
+  statusEl.style.padding = '3px 8px';
+  statusEl.style.borderRadius = '0';
+  statusEl.style.fontWeight = '700';
+  statusEl.style.textTransform = 'uppercase';
+  statusEl.style.letterSpacing = '0.05em';
+  statusEl.style.border = '1px solid #fff';
+  if (h.ollama.isGemini) {
+    statusEl.style.background = '#fff';
+    statusEl.style.color = '#000';
+    statusEl.textContent = `Connected: ${modelInfo}`;
+  } else if (h.ollama.ok && h.ollama.present) {
+    statusEl.style.background = '#fff';
+    statusEl.style.color = '#000';
+    statusEl.textContent = `Connected: ${modelInfo}`;
+  } else {
+    statusEl.style.background = '#000';
+    statusEl.style.color = '#fff';
+    statusEl.textContent = `Ollama Offline`;
+  }
+  document.querySelector('.bar').append(statusEl);
 });
 </script>
 </body>

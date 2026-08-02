@@ -12,7 +12,7 @@ const RULES = `HARD RULES — these override everything else:
   imply it. Omission is correct; invention is a failure.
 - Keep each rewritten bullet within ~10% of the original length.`;
 
-async function readJd(jdText) {
+async function readJd(jdText, llmOpts) {
   const out = await chatJson([
     { role: 'system', content: 'You extract structured data from job descriptions. Reply with JSON only.' },
     {
@@ -28,7 +28,7 @@ Return JSON:
 JOB POSTING:
 ${jdText.slice(0, 9000)}`,
     },
-  ]);
+  ], llmOpts);
   return {
     title: out.title || null,
     company: out.company || null,
@@ -39,7 +39,7 @@ ${jdText.slice(0, 9000)}`,
   };
 }
 
-async function tailorSummary(facts, jd) {
+async function tailorSummary(facts, jd, llmOpts) {
   if (!facts.summary) return null;
   const out = await chatJson([
     { role: 'system', content: `You re-angle an existing resume summary toward a job. ${RULES}` },
@@ -54,11 +54,11 @@ WHAT THEY WANT: ${[...jd.mustHave, ...jd.keywords].join(', ')}
 Rewrite the summary so the parts relevant to this role come first and use their
 words where they already match. Same length. Return JSON: {"text": string}`,
     },
-  ]);
+  ], llmOpts);
   return { id: facts.summary.id, text: String(out.text || facts.summary.text).trim() };
 }
 
-async function tailorBullets(label, bullets, jd) {
+async function tailorBullets(label, bullets, jd, llmOpts) {
   if (!bullets || !bullets.length) return [];
   const src = bullets.map((b) => `${b.id}: ${b.text}`).join('\n');
   const out = await chatJson([
@@ -77,7 +77,7 @@ bullet exactly once. You may change their order. Each output object MUST carry
 
 Return JSON: {"bullets": [{"from": "<source id>", "text": "<rewritten>"}]}`,
     },
-  ]);
+  ], llmOpts);
   const byId = new Map(bullets.map((b) => [b.id, b]));
   const seen = new Set();
   const result = [];
@@ -94,7 +94,7 @@ Return JSON: {"bullets": [{"from": "<source id>", "text": "<rewritten>"}]}`,
   return result;
 }
 
-async function orderSkills(facts, jd) {
+async function orderSkills(facts, jd, llmOpts) {
   const groups = facts.skills || [];
   if (!groups.length) return [];
   const payload = groups.map((g) => `${g.id} | ${g.label}: ${(g.items || []).join(', ')}`).join('\n');
@@ -113,7 +113,7 @@ Do NOT add, rename, or remove any item. Return every group.
 
 Return JSON: {"groups": [{"id": string, "items": [string]}]}`,
     },
-  ]);
+  ], llmOpts);
   const byId = new Map(groups.map((g) => [g.id, g]));
   const result = [];
   for (const g of out.groups || []) {
@@ -143,9 +143,9 @@ function findGaps(facts, jd) {
 // Every section depends only on the parsed JD, never on another section, so
 // after the JD is read they all run concurrently. On a CPU-only laptop this is
 // the difference between one slow round and seven.
-async function* tailorStream(facts, jdText) {
+async function* tailorStream(facts, jdText, llmOpts) {
   yield { type: 'status', stage: 'reading-jd' };
-  const jd = await readJd(jdText);
+  const jd = await readJd(jdText, llmOpts);
   yield { type: 'jd', jd };
 
   const run = {
@@ -167,15 +167,15 @@ async function* tailorStream(facts, jdText) {
   const projects = (facts.projects || []).map((p) => ({ ...p }));
 
   const tasks = [
-    { key: 'summary', label: 'summary', run: () => tailorSummary(facts, jd) },
-    { key: 'skills', label: 'skills', run: () => orderSkills(facts, jd) },
+    { key: 'summary', label: 'summary', run: () => tailorSummary(facts, jd, llmOpts) },
+    { key: 'skills', label: 'skills', run: () => orderSkills(facts, jd, llmOpts) },
     ...experience.map((e, i) => ({
       key: 'experience', label: e.org, index: i,
-      run: () => tailorBullets(`${e.role} at ${e.org}`, e.bullets, jd),
+      run: () => tailorBullets(`${e.role} at ${e.org}`, e.bullets, jd, llmOpts),
     })),
     ...projects.map((p, i) => ({
       key: 'projects', label: p.name, index: i,
-      run: () => tailorBullets(`${p.name} (${p.stack})`, p.bullets, jd),
+      run: () => tailorBullets(`${p.name} (${p.stack})`, p.bullets, jd, llmOpts),
     })),
   ];
 

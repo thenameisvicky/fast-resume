@@ -8,8 +8,8 @@ const RIGHT_EDGE_TOL = 3;
 function fontStyle(name, size, fontMap) {
   const real = fontMap[name] || '';
   return {
-    bold: /Bold/i.test(real),
-    italic: /Italic|Oblique/i.test(real),
+    bold: /Bold|CMBX|SFBX|CMB|CMCSC/i.test(real),
+    italic: /Italic|Oblique|CMSL|SL/i.test(real),
     size,
   };
 }
@@ -237,8 +237,11 @@ function parse(lines, rightEdge, links) {
         if (line.text.trim().startsWith('•') || !line.runs.some((r) => r.bold)) { i++; continue; }
         const a = splitAligned(line, rightEdge);
         const roleLine = chunk[i + 1];
-        const b = roleLine ? splitAligned(roleLine, rightEdge) : { left: '', right: '' };
-        let j = i + 2;
+        const isNewEntry = roleLine && !roleLine.text.trim().startsWith('•')
+          && roleLine.runs.some((r) => r.bold) && Math.abs(roleLine.x - line.x) < 2;
+        const hasRoleLine = roleLine && !roleLine.text.trim().startsWith('•') && !isNewEntry;
+        const b = hasRoleLine ? splitAligned(roleLine, rightEdge) : { left: '', right: '' };
+        let j = hasRoleLine ? i + 2 : i + 1;
         const body = [];
         while (j < chunk.length) {
           const nxt = chunk[j];
@@ -262,25 +265,34 @@ function parse(lines, rightEdge, links) {
 
     if (/project/.test(key)) {
       const entries = [];
-      let i = 0;
-      while (i < chunk.length) {
-        const line = chunk[i];
-        if (line.text.trim().startsWith('•')) { i++; continue; }
-        const boldRuns = line.runs.filter((r) => r.bold && !r.italic);
-        const italRuns = line.runs.filter((r) => r.italic);
-        let j = i + 1;
-        const body = [];
-        while (j < chunk.length && chunk[j].text.trim().startsWith('•')
-          || (j < chunk.length && !chunk[j].runs.some((r) => r.bold) && body.length)) {
-          body.push(chunk[j]); j++;
-        }
+      if (chunk[0] && chunk[0].text.trim().startsWith('•')) {
         entries.push({
           id: nextId('p'),
-          name: boldRuns.map((r) => r.text).join('').trim(),
-          stack: italRuns.map((r) => r.text).join('').trim(),
-          bullets: readBullets(body),
+          name: '',
+          stack: '',
+          bullets: readBullets(chunk),
         });
-        i = j;
+      } else {
+        let i = 0;
+        while (i < chunk.length) {
+          const line = chunk[i];
+          if (line.text.trim().startsWith('•')) { i++; continue; }
+          const boldRuns = line.runs.filter((r) => r.bold && !r.italic);
+          const italRuns = line.runs.filter((r) => r.italic);
+          let j = i + 1;
+          const body = [];
+          while (j < chunk.length && chunk[j].text.trim().startsWith('•')
+            || (j < chunk.length && !chunk[j].runs.some((r) => r.bold) && body.length)) {
+            body.push(chunk[j]); j++;
+          }
+          entries.push({
+            id: nextId('p'),
+            name: boldRuns.map((r) => r.text).join('').trim(),
+            stack: italRuns.map((r) => r.text).join('').trim(),
+            bullets: readBullets(body),
+          });
+          i = j;
+        }
       }
       out.projects = entries;
       out.projectsTitle = sec.title;
@@ -292,7 +304,7 @@ function parse(lines, rightEdge, links) {
       let acc = null;
       for (const line of chunk) {
         const lead = line.runs[0];
-        if (lead && lead.bold && /:/.test(lead.text)) {
+        if (lead && lead.bold && (/:/.test(lead.text) || line.runs.length > 1)) {
           if (acc) groups.push(acc);
           acc = {
             label: lead.text.replace(/:\s*$/, '').trim(),
@@ -318,14 +330,27 @@ function parse(lines, rightEdge, links) {
 
     if (/education/.test(key)) {
       const entries = [];
-      for (let i = 0; i < chunk.length; i += 2) {
+      let i = 0;
+      while (i < chunk.length) {
         const a = splitAligned(chunk[i], rightEdge);
-        const b = chunk[i + 1] ? splitAligned(chunk[i + 1], rightEdge) : { left: '', right: '' };
-        entries.push({
-          id: nextId('d'),
-          school: a.left, dates: a.right,
-          degree: b.left, location: b.right,
-        });
+        const nextLine = chunk[i + 1];
+        const isTwoLine = nextLine && !/^\d{4}/.test(nextLine.text.trim()) && !nextLine.runs.some(r => r.bold && /20\d\d/.test(r.text));
+        if (isTwoLine) {
+          const b = splitAligned(nextLine, rightEdge);
+          entries.push({
+            id: nextId('d'),
+            school: a.left, dates: a.right,
+            degree: b.left, location: b.right,
+          });
+          i += 2;
+        } else {
+          entries.push({
+            id: nextId('d'),
+            school: a.left, dates: a.right,
+            degree: '', location: '',
+          });
+          i += 1;
+        }
       }
       out.education = entries;
       out.educationTitle = sec.title;
@@ -337,16 +362,20 @@ function parse(lines, rightEdge, links) {
 }
 
 async function importPdf(file) {
+  console.log(`[Import] Starting PDF parsing of file: ${file}`);
   const { pages, fontMap, links } = await readItems(file);
+  console.log(`[Import] Read ${pages.length} page(s) and resolved ${Object.keys(fontMap).length} font(s).`);
   const page = pages[0];
   const all = pages.flatMap((p) => p.items);
+  console.log(`[Import] Grouping ${all.length} text items into lines...`);
   const lines = groupLines(all, fontMap);
+  console.log(`[Import] Grouped into ${lines.length} lines. Extracting edges...`);
 
   const rightEdge = Math.max(...lines.flatMap((l) => l.runs.map((r) => r.end)));
-  // Bullet glyphs hang into the margin, so measure the block edge without them.
   const bodyLines = lines.filter((l) => !l.text.trim().startsWith('•'));
   const leftEdge = Math.min(...bodyLines.map((l) => l.x));
 
+  console.log(`[Import] Parsing lines into facts JSON structure...`);
   const facts = parse(lines, rightEdge, links);
   facts.layout = {
     pageWidth: page.width,
@@ -354,6 +383,7 @@ async function importPdf(file) {
     marginLeft: +leftEdge.toFixed(2),
     contentWidth: +(rightEdge - leftEdge).toFixed(2),
   };
+  console.log(`[Import] Successfully parsed facts for: "${facts.name}". Warnings count: ${facts.warnings.length}`);
   return facts;
 }
 

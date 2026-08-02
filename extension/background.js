@@ -13,7 +13,7 @@ chrome.action.onClicked.addListener(async (tab) => {
     await chrome.scripting.executeScript({ target: { tabId: tab.id }, files: ['content.js'] });
     await chrome.tabs.sendMessage(tab.id, { type: 'jw-open' });
   } catch (e) {
-    console.error('jobwire: could not open on this page', e);
+    console.error('fast-CV: could not open on this page', e);
   }
 });
 
@@ -27,7 +27,7 @@ async function streamTailor(port, payload) {
       body: JSON.stringify(payload),
     });
   } catch (e) {
-    port.postMessage({ type: 'error', error: `cannot reach jobwire server at ${base}. Is it running?` });
+    port.postMessage({ type: 'error', error: `cannot reach fast-CV server at ${base}. Is it running?` });
     return;
   }
   if (!res.ok) {
@@ -56,7 +56,7 @@ async function streamTailor(port, payload) {
 }
 
 chrome.runtime.onConnect.addListener((port) => {
-  if (port.name !== 'jobwire') return;
+  if (port.name !== 'fast-cv') return;
   port.onMessage.addListener(async (msg) => {
     if (msg.type === 'tailor') streamTailor(port, msg.payload);
   });
@@ -66,6 +66,32 @@ chrome.runtime.onMessage.addListener((msg, sender, reply) => {
   (async () => {
     const base = await serverUrl();
     if (msg.type === 'jw-base') return reply({ base });
+
+    if (msg.type === 'jw-upload-resume') {
+      try {
+        const importRes = await fetch(`${base}/import`, {
+          method: 'POST',
+          headers: { 'content-type': 'application/json' },
+          body: JSON.stringify({ pdfBase64: msg.pdfBase64 }),
+        });
+        if (!importRes.ok) {
+          const text = await importRes.text();
+          return reply({ ok: false, error: `Import failed: ${text || importRes.statusText}` });
+        }
+        const facts = await importRes.json();
+        const saveRes = await fetch(`${base}/facts`, {
+          method: 'PUT',
+          headers: { 'content-type': 'application/json' },
+          body: JSON.stringify(facts),
+        });
+        if (!saveRes.ok) {
+          return reply({ ok: false, error: `Save failed: ${saveRes.statusText}` });
+        }
+        return reply({ ok: true, name: facts.name });
+      } catch (e) {
+        return reply({ ok: false, error: e.message });
+      }
+    }
 
     if (msg.type === 'jw-health') {
       try {

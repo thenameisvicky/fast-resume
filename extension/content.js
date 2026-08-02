@@ -1,6 +1,6 @@
 (() => {
-  if (window.__jobwireLoaded) { window.__jobwireOpen(); return; }
-  window.__jobwireLoaded = true;
+  if (window.__fastCvLoaded) { window.__fastCvOpen(); return; }
+  window.__fastCvLoaded = true;
 
   // ---------- JD extraction ----------
 
@@ -90,7 +90,7 @@
   const CSS = `
 :host{all:initial}
 .wrap{position:fixed;inset:0;z-index:2147483647;display:flex;align-items:center;
-  justify-content:center;background:rgba(15, 23, 42, 0.75);backdrop-filter:blur(8px);
+  justify-content:center;background:rgba(0, 0, 0, 0.85);backdrop-filter:blur(8px);
   font-family:ui-sans-serif,system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
   transition: background 0.3s, backdrop-filter 0.3s;}
 
@@ -105,28 +105,28 @@
   backdrop-filter: none !important;
 }
 
-.box{background:#fff;color:#0f172a;width:min(1240px,95vw);height:min(880px,93vh);
-  border-radius:16px;display:flex;flex-direction:column;overflow:hidden;
-  box-shadow:0 25px 50px -12px rgba(0, 0, 0, 0.25);border:1px solid rgba(0,0,0,0.08);
+.box{background:#fff;color:#000;width:min(1240px,95vw);height:min(880px,93vh);
+  border-radius:0;display:flex;flex-direction:column;overflow:hidden;
+  box-shadow:none;border:1px solid #000;
   transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1), height 0.3s cubic-bezier(0.4, 0, 0.2, 1);}
 
 .wrap.collapsed .box {
   width: 100%;
   height: auto;
   max-height: 90vh;
-  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.15), 0 10px 10px -5px rgba(0, 0, 0, 0.08);
+  box-shadow: none;
 }
 
-.top{display:flex;align-items:center;gap:10px;padding:12px 16px;border-bottom:1px solid #e2e8f0;flex:none;background:#ffffff}
-.brand{font-weight:800;font-size:15px;letter-spacing:-.03em;color:#4f46e5;display:flex;align-items:center;gap:6px}
-.brand::before{content:"";display:inline-block;width:8px;height:8px;background:#4f46e5;border-radius:50%}
-.role{color:#64748b;font-size:12.5px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;flex:1;font-weight:500;padding-right:8px}
+.top{display:flex;align-items:center;gap:10px;padding:12px 16px;border-bottom:1px solid #000;flex:none;background:#ffffff}
+.brand{font-weight:800;font-size:15px;letter-spacing:-.03em;color:#000;display:flex;align-items:center;gap:6px;text-transform:uppercase}
+.brand::before{content:"";display:inline-block;width:6px;height:6px;background:#000;border-radius:0}
+.role{color:#666;font-size:12.5px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;flex:1;font-weight:500;padding-right:8px}
 
 .btn-header {
-  border: 0;
-  background: #f1f5f9;
-  color: #64748b;
-  border-radius: 50%;
+  border: 1px solid #000;
+  background: #fff;
+  color: #000;
+  border-radius: 0;
   width: 28px;
   height: 28px;
   cursor: pointer;
@@ -137,35 +137,34 @@
   flex: none;
 }
 .btn-header:hover {
-  background: #e2e8f0;
-  color: #0f172a;
-  transform: scale(1.05);
+  background: #000;
+  color: #fff;
 }
 
 .main{display:flex;flex:1;min-height:0}
-.left{flex:1;min-width:0;background:#e2e8f0;overflow:auto;padding:24px;display:flex;justify-content:center;align-items:flex-start}
-iframe{width:794px;height:1123px;border:0;background:#fff;box-shadow:0 8px 30px rgba(0,0,0,0.08);flex:none;border-radius:4px;overflow:hidden}
-.right{width:340px;flex:none;border-left:1px solid #e2e8f0;overflow:auto;padding:20px;font-size:13px;background:#ffffff;display:flex;flex-direction:column;gap:20px}
-.bot{display:flex;align-items:center;gap:12px;padding:14px 20px;border-top:1px solid #e2e8f0;flex:none;background:#ffffff}
+.left{flex:1;min-width:0;background:#111;overflow:auto;padding:24px;display:flex;justify-content:center;align-items:flex-start}
+iframe{width:794px;height:1123px;border:1px solid #000;background:#fff;box-shadow:none;flex:none;border-radius:0;overflow:hidden}
+.right{width:340px;flex:none;border-left:1px solid #000;overflow:auto;padding:20px;font-size:13px;background:#ffffff;display:flex;flex-direction:column;gap:20px}
+.bot{display:flex;align-items:center;gap:12px;padding:14px 20px;border-top:1px solid #000;flex:none;background:#ffffff}
 .grow{flex:1}
-button.act{border:0;border-radius:8px;padding:10px 18px;font-size:13px;font-weight:600;cursor:pointer;transition:all 0.2s}
-.primary{background:linear-gradient(135deg, #4f46e5 0%, #6366f1 100%);color:#fff;box-shadow:0 4px 12px rgba(79, 70, 229, 0.2)}
-.primary:hover{background:linear-gradient(135deg, #4338ca 0%, #4f46e5 100%);transform:translateY(-1px);box-shadow:0 6px 16px rgba(79, 70, 229, 0.3)}
-.ghost{background:#f1f5f9;color:#334155}
-.ghost:hover{background:#e2e8f0;color:#0f172a}
-button:disabled{opacity:.45;cursor:not-allowed;transform:none !important;box-shadow:none !important}
-.status{font-size:12.5px;color:#475569;display:flex;align-items:center;gap:8px;font-weight:500}
-.spin{width:14px;height:14px;border:2px solid #cbd5e1;border-top-color:#4f46e5;border-radius:50%;animation:s .7s linear infinite}
+button.act{border:1px solid #000;border-radius:0;padding:10px 18px;font-size:13px;font-weight:600;cursor:pointer;transition:all 0.2s}
+.primary{background:#000;color:#fff;}
+.primary:hover{background:#fff;color:#000;}
+.ghost{background:#fff;color:#000}
+.ghost:hover{background:#000;color:#fff}
+button:disabled{opacity:.35;cursor:not-allowed;background:#ccc;color:#666;border-color:#ccc}
+.status{font-size:12.5px;color:#000;display:flex;align-items:center;gap:8px;font-weight:500}
+.spin{width:14px;height:14px;border:2px solid #ccc;border-top-color:#000;border-radius:50%;animation:s .7s linear infinite}
 @keyframes s{to{transform:rotate(360deg)}}
-h4{margin:0;font-size:11px;text-transform:uppercase;letter-spacing:.08em;color:#64748b;font-weight:700}
-.pill{display:inline-block;background:#f0f7ff;color:#0284c7;border:1px solid #e0f2fe;border-radius:6px;padding:3px 8px;margin:0 4px 4px 0;font-size:11.5px;font-weight:500}
-.gap{display:inline-block;background:#fffbeb;color:#d97706;border:1px solid #fef3c7;border-radius:6px;padding:3px 8px;margin:0 4px 4px 0;font-size:11.5px;font-weight:500}
-.warn{background:#fef2f2;color:#991b1b;border-radius:8px;padding:10px 12px;font-size:12px;line-height:1.45;border-left:4px solid #ef4444;border:1px solid #fee2e2;border-left-width:4px}
-.ok{background:#f0fdf4;color:#166534;border-radius:8px;padding:10px 12px;font-size:12px;border-left:4px solid #22c55e;border:1px solid #dcfce7;border-left-width:4px}
-.note{color:#64748b;font-size:11.5px;line-height:1.5}
-.jdbox{width:100%;height:120px;font:12px/1.45 ui-monospace,monospace;border:1px solid #cbd5e1;border-radius:8px;padding:10px;resize:vertical;background:#fff;box-sizing:border-box}
-.jdbox:focus{border-color:#6366f1;outline:none}
-.fitbad{background:#fffbeb;color:#92400e;border-radius:8px;padding:10px 12px;font-size:12px;border-left:4px solid #f59e0b;border:1px solid #fef3c7;border-left-width:4px}
+h4{margin:0;font-size:11px;text-transform:uppercase;letter-spacing:.08em;color:#000;font-weight:700}
+.pill{display:inline-block;background:#ffffff;color:#000;border:1px solid #000;border-radius:0;padding:3px 8px;margin:0 4px 4px 0;font-size:11.5px;font-weight:500}
+.gap{display:inline-block;background:#f5f5f5;color:#666;border:1px solid #ccc;border-radius:0;padding:3px 8px;margin:0 4px 4px 0;font-size:11.5px;font-weight:500}
+.warn{background:#ffffff;color:#000;border-radius:0;padding:10px 12px;font-size:12px;line-height:1.45;border:1px solid #000;border-left:4px solid #000}
+.ok{background:#ffffff;color:#000;border-radius:0;padding:10px 12px;font-size:12px;border:1px solid #ccc;border-left:4px solid #ccc}
+.note{color:#666;font-size:11.5px;line-height:1.5}
+.jdbox{width:100%;height:120px;font:12px/1.45 ui-monospace,monospace;border:1px solid #000;border-radius:0;padding:10px;resize:vertical;background:#fff;box-sizing:border-box;color:#000}
+.jdbox:focus{border-color:#000;outline:none}
+.fitbad{background:#ffffff;color:#000;border-radius:0;padding:10px 12px;font-size:12px;border:1px solid #000;border-left:4px solid #000}
 
 /* Input View Screen */
 .input-view {
@@ -175,32 +174,34 @@ h4{margin:0;font-size:11px;text-transform:uppercase;letter-spacing:.08em;color:#
   justify-content: center;
   flex: 1;
   padding: 24px;
-  background: #f8fafc;
+  background: #ffffff;
   box-sizing: border-box;
+  position: relative;
 }
 .input-card {
   background: #fff;
-  border: 1px solid #e2e8f0;
-  border-radius: 12px;
+  border: 1px solid #000;
+  border-radius: 0;
   padding: 24px;
   width: 100%;
-  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
   display: flex;
   flex-direction: column;
   align-items: center;
   box-sizing: border-box;
+  position: relative;
 }
 .input-title {
   font-size: 18px;
   font-weight: 800;
-  color: #0f172a;
+  color: #000;
   margin: 0 0 6px 0;
   letter-spacing: -0.02em;
   text-align: center;
+  text-transform: uppercase;
 }
 .input-subtitle {
   font-size: 12.5px;
-  color: #64748b;
+  color: #666;
   margin: 0 0 16px 0;
   text-align: center;
   line-height: 1.4;
@@ -210,43 +211,63 @@ h4{margin:0;font-size:11px;text-transform:uppercase;letter-spacing:.08em;color:#
   height: 130px;
   font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
   font-size: 12px;
-  border: 1px solid #cbd5e1;
-  border-radius: 8px;
+  border: 1px solid #000;
+  border-radius: 0;
   padding: 10px;
   margin-bottom: 16px;
   outline: none;
   resize: none;
   transition: all 0.2s;
   box-sizing: border-box;
-  background: #f8fafc;
+  background: #ffffff;
+  color: #000;
   line-height: 1.4;
 }
 .jd-input:focus {
-  border-color: #6366f1;
+  border-color: #000;
   background: #fff;
-  box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
 }
-.gen-btn {
-  background: linear-gradient(135deg, #4f46e5 0%, #6366f1 100%);
+.btn-row {
+  display: flex;
+  gap: 12px;
+  margin-bottom: 16px;
+  width: 100%;
+  box-sizing: border-box;
+}
+.gen-btn, .upload-btn {
+  flex: 1;
+  background: #000;
   color: #fff;
-  border: 0;
-  border-radius: 8px;
-  padding: 11px 22px;
-  font-size: 13px;
-  font-weight: 600;
+  border: 1px solid #000;
+  border-radius: 0;
+  padding: 11px 16px;
+  font-size: 11px;
+  font-weight: 700;
   cursor: pointer;
   transition: all 0.2s;
-  box-shadow: 0 4px 10px rgba(79, 70, 229, 0.2);
-  width: 100%;
-  max-width: 180px;
   text-align: center;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  box-sizing: border-box;
 }
 .gen-btn:hover {
-  transform: translateY(-1px);
-  box-shadow: 0 6px 14px rgba(79, 70, 229, 0.28);
+  background: #fff;
+  color: #000;
 }
-.gen-btn:active {
+.gen-btn:active, .upload-btn:active {
   transform: translateY(0);
+}
+.upload-btn {
+  background: #fff;
+  color: #000;
+}
+.upload-btn:hover {
+  background: #000;
+  color: #fff;
+}
+.gen-btn:disabled, .upload-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
 }
 
 /* Info Icon and Tooltip */
@@ -256,7 +277,7 @@ h4{margin:0;font-size:11px;text-transform:uppercase;letter-spacing:.08em;color:#
   gap: 5px;
   margin-top: 14px;
   font-size: 11.5px;
-  color: #64748b;
+  color: #666;
   position: relative;
   cursor: pointer;
   user-select: none;
@@ -267,19 +288,20 @@ h4{margin:0;font-size:11px;text-transform:uppercase;letter-spacing:.08em;color:#
   justify-content: center;
   width: 14px;
   height: 14px;
-  border-radius: 50%;
-  background: #e2e8f0;
-  color: #475569;
+  border-radius: 0;
+  border: 1px solid #000;
+  background: #fff;
+  color: #000;
   font-weight: bold;
   font-size: 10px;
 }
 .info-tooltip {
   visibility: hidden;
   width: 260px;
-  background: #1e293b;
-  color: #f8fafc;
+  background: #000;
+  color: #fff;
   text-align: left;
-  border-radius: 8px;
+  border-radius: 0;
   padding: 12px;
   position: absolute;
   z-index: 1000;
@@ -288,10 +310,9 @@ h4{margin:0;font-size:11px;text-transform:uppercase;letter-spacing:.08em;color:#
   transform: translateX(-50%);
   opacity: 0;
   transition: opacity 0.2s;
-  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.25);
   font-weight: normal;
   line-height: 1.45;
-  border: 1px solid rgba(255,255,255,0.08);
+  border: 1px solid #fff;
 }
 .info-tooltip::after {
   content: "";
@@ -301,7 +322,7 @@ h4{margin:0;font-size:11px;text-transform:uppercase;letter-spacing:.08em;color:#
   margin-left: -5px;
   border-width: 5px;
   border-style: solid;
-  border-color: #1e293b transparent transparent transparent;
+  border-color: #000 transparent transparent transparent;
 }
 .info-container:hover .info-tooltip {
   visibility: visible;
@@ -310,17 +331,18 @@ h4{margin:0;font-size:11px;text-transform:uppercase;letter-spacing:.08em;color:#
 .tooltip-title {
   font-weight: 700;
   margin-bottom: 6px;
-  color: #38bdf8;
+  color: #fff;
   font-size: 12px;
+  text-transform: uppercase;
 }
 .tooltip-step {
   margin: 4px 0;
   font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
-  background: rgba(255, 255, 255, 0.12);
+  background: #333;
   padding: 3px 6px;
-  border-radius: 4px;
+  border-radius: 0;
   font-size: 10.5px;
-  color: #e2e8f0;
+  color: #fff;
 }
 
 /* Progress Container */
@@ -332,46 +354,31 @@ h4{margin:0;font-size:11px;text-transform:uppercase;letter-spacing:.08em;color:#
 }
 .progress-bar-bg {
   width: 100%;
-  height: 8px;
-  background: #e2e8f0;
-  border-radius: 9999px;
+  height: 6px;
+  background: #eee;
+  border-radius: 0;
   overflow: hidden;
   margin-bottom: 12px;
   position: relative;
+  border: 1px solid #000;
 }
 .progress-bar-fill {
   width: 0%;
   height: 100%;
-  background: linear-gradient(90deg, #4f46e5 0%, #3b82f6 100%);
-  border-radius: 9999px;
+  background: #000;
+  border-radius: 0;
   transition: width 0.4s cubic-bezier(0.4, 0, 0.2, 1);
   position: relative;
-}
-.progress-bar-fill::after {
-  content: '';
-  position: absolute;
-  top: 0; left: 0; right: 0; bottom: 0;
-  background: linear-gradient(
-    90deg,
-    rgba(255, 255, 255, 0) 0%,
-    rgba(255, 255, 255, 0.3) 50%,
-    rgba(255, 255, 255, 0) 100%
-  );
-  animation: sh 1.5s infinite;
-}
-@keyframes sh {
-  0% { transform: translateX(-100%); }
-  100% { transform: translateX(100%); }
 }
 .progress-text {
   font-size: 20px;
   font-weight: 800;
-  color: #0f172a;
+  color: #000;
   margin-bottom: 6px;
 }
 .progress-sub {
   font-size: 12px;
-  color: #64748b;
+  color: #666;
   font-weight: 500;
   text-align: center;
 }
@@ -385,7 +392,7 @@ h4{margin:0;font-size:11px;text-transform:uppercase;letter-spacing:.08em;color:#
 }
 .complete-icon {
   font-size: 40px;
-  color: #10b981;
+  color: #000;
   margin-bottom: 10px;
   animation: scIn 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
 }
@@ -396,12 +403,13 @@ h4{margin:0;font-size:11px;text-transform:uppercase;letter-spacing:.08em;color:#
 .complete-text {
   font-size: 18px;
   font-weight: 800;
-  color: #0f172a;
+  color: #000;
   margin-bottom: 6px;
+  text-transform: uppercase;
 }
 .complete-sub {
   font-size: 13px;
-  color: #64748b;
+  color: #666;
   margin-bottom: 16px;
   text-align: center;
   line-height: 1.45;
@@ -413,8 +421,8 @@ h4{margin:0;font-size:11px;text-transform:uppercase;letter-spacing:.08em;color:#
   justify-content: center;
 }
 .complete-btn {
-  border: 0;
-  border-radius: 8px;
+  border: 1px solid #000;
+  border-radius: 0;
   padding: 11px 22px;
   font-size: 13px;
   font-weight: 600;
@@ -423,24 +431,23 @@ h4{margin:0;font-size:11px;text-transform:uppercase;letter-spacing:.08em;color:#
   flex: 1;
   max-width: 140px;
   text-align: center;
+  text-transform: uppercase;
 }
 .btn-preview {
-  background: #1e293b;
-  color: #fff;
-  box-shadow: 0 4px 10px rgba(30, 41, 59, 0.1);
+  background: #fff;
+  color: #000;
 }
 .btn-preview:hover {
-  background: #0f172a;
-  transform: translateY(-1px);
+  background: #000;
+  color: #fff;
 }
 .btn-download {
-  background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+  background: #000;
   color: #fff;
-  box-shadow: 0 4px 10px rgba(16, 185, 129, 0.15);
 }
 .btn-download:hover {
-  background: linear-gradient(135deg, #059669 0%, #047857 100%);
-  transform: translateY(-1px);
+  background: #fff;
+  color: #000;
 }
 
 /* Error Container */
@@ -453,47 +460,48 @@ h4{margin:0;font-size:11px;text-transform:uppercase;letter-spacing:.08em;color:#
 .error-title {
   font-size: 16px;
   font-weight: 800;
-  color: #dc2626;
+  color: #000;
   margin-bottom: 6px;
+  text-transform: uppercase;
 }
 .error-msg {
   font-size: 12px;
-  color: #ef4444;
+  color: #000;
   margin-bottom: 14px;
   text-align: center;
-  background: #fef2f2;
-  border: 1px solid #fee2e2;
+  background: #fff;
+  border: 1px solid #000;
   padding: 10px 12px;
-  border-radius: 8px;
+  border-radius: 0;
   width: 100%;
   box-sizing: border-box;
   line-height: 1.45;
 }
 .error-setup-info {
-  background: #f8fafc;
-  border: 1px solid #e2e8f0;
-  border-radius: 8px;
+  background: #fff;
+  border: 1px solid #000;
+  border-radius: 0;
   padding: 12px;
   margin-bottom: 14px;
   text-align: left;
   width: 100%;
   box-sizing: border-box;
   font-size: 12px;
-  color: #475569;
+  color: #000;
   line-height: 1.5;
 }
 .error-setup-info .tooltip-step {
-  background: #0f172a;
-  color: #38bdf8;
+  background: #000;
+  color: #fff;
   font-weight: 500;
   display: block;
   margin: 4px 0 8px 0;
 }
 .btn-back {
-  background: #f1f5f9;
-  color: #475569;
-  border: 1px solid #cbd5e1;
-  border-radius: 8px;
+  background: #fff;
+  color: #000;
+  border: 1px solid #000;
+  border-radius: 0;
   padding: 8px 16px;
   font-size: 12px;
   font-weight: 600;
@@ -501,8 +509,138 @@ h4{margin:0;font-size:11px;text-transform:uppercase;letter-spacing:.08em;color:#
   transition: all 0.2s;
 }
 .btn-back:hover {
-  background: #e2e8f0;
-  color: #0f172a;
+  background: #000;
+  color: #fff;
+}
+.header-progress-bar {
+  width: 100%;
+  height: 2px;
+  background: #eee;
+  overflow: hidden;
+  position: relative;
+  display: none;
+  flex: none;
+}
+.header-progress-fill {
+  width: 0%;
+  height: 100%;
+  background: #000;
+  transition: width 0.3s ease;
+}
+
+/* Inference Selector Modal */
+.llm-modal-overlay {
+  position: absolute;
+  inset: 0;
+  background: rgba(255, 255, 255, 0.98);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  z-index: 100;
+  padding: 20px;
+  box-sizing: border-box;
+}
+.llm-modal-title {
+  font-size: 14px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: #000;
+  margin-bottom: 16px;
+}
+.llm-option-group {
+  display: flex;
+  gap: 10px;
+  width: 100%;
+  max-width: 280px;
+  margin-bottom: 16px;
+}
+.llm-opt-btn {
+  flex: 1;
+  background: #fff;
+  color: #000;
+  border: 1px solid #000;
+  padding: 8px;
+  font-size: 11px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+  text-align: center;
+  text-transform: uppercase;
+}
+.llm-opt-btn.active {
+  background: #000;
+  color: #fff;
+}
+.llm-opt-btn:hover {
+  background: #000;
+  color: #fff;
+}
+.llm-key-form {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  width: 100%;
+  max-width: 280px;
+  margin-bottom: 20px;
+}
+.llm-field {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.llm-label {
+  font-size: 9px;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  font-weight: 700;
+  color: #666;
+}
+.llm-select, .llm-input {
+  width: 100%;
+  padding: 6px 8px;
+  border: 1px solid #000;
+  font-size: 11px;
+  font-family: inherit;
+  box-sizing: border-box;
+  background: #fff;
+  color: #000;
+  outline: none;
+}
+.llm-actions {
+  display: flex;
+  gap: 10px;
+  width: 100%;
+  max-width: 280px;
+}
+.llm-action-btn {
+  flex: 1;
+  padding: 8px;
+  font-size: 11px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+  box-sizing: border-box;
+  text-align: center;
+  border: 1px solid #000;
+  text-transform: uppercase;
+}
+.llm-action-btn.primary {
+  background: #000;
+  color: #fff;
+}
+.llm-action-btn.primary:hover {
+  background: #fff;
+  color: #000;
+}
+.llm-action-btn.secondary {
+  background: #fff;
+  color: #000;
+}
+.llm-action-btn.secondary:hover {
+  background: #000;
+  color: #fff;
 }
 `;
 
@@ -524,6 +662,9 @@ h4{margin:0;font-size:11px;text-transform:uppercase;letter-spacing:.08em;color:#
     if (fill) fill.style.width = `${percentage}%`;
     if (text) text.textContent = `${percentage}%`;
     if (sub) sub.textContent = subText || '';
+
+    const hFill = $('header-progress-fill');
+    if (hFill) hFill.style.width = `${percentage}%`;
   }
 
   function updateViewVisibility() {
@@ -562,7 +703,7 @@ h4{margin:0;font-size:11px;text-transform:uppercase;letter-spacing:.08em;color:#
 
   function build() {
     host = document.createElement('div');
-    host.id = 'jobwire-host';
+    host.id = 'fast-cv-host';
     root = host.attachShadow({ mode: 'open' });
     const style = document.createElement('style');
     style.textContent = CSS;
@@ -572,7 +713,7 @@ h4{margin:0;font-size:11px;text-transform:uppercase;letter-spacing:.08em;color:#
     const box = el('div', 'box');
 
     const top = el('div', 'top');
-    top.append(el('div', 'brand', 'jobwire'));
+    top.append(el('div', 'brand', 'fast-CV'));
     const role = el('div', 'role', 'reading this page…');
     role.id = 'role';
     
@@ -599,12 +740,104 @@ h4{margin:0;font-size:11px;text-transform:uppercase;letter-spacing:.08em;color:#
     jdTextarea.placeholder = 'Paste job description details here...';
     card.append(jdTextarea);
 
+    const btnRow = el('div', 'btn-row');
+    btnRow.id = 'btn-row';
+
     const genBtn = el('button', 'gen-btn', 'Generate');
     genBtn.id = 'gen-btn';
-    card.append(genBtn);
+
+    const uploadBtn = el('button', 'upload-btn', 'Upload CV');
+    uploadBtn.id = 'upload-btn';
+    uploadBtn.title = 'upload to wire the resume';
+
+    const fileInput = el('input');
+    fileInput.type = 'file';
+    fileInput.accept = 'application/pdf';
+    fileInput.style.display = 'none';
+    fileInput.id = 'cv-file-input';
+
+    uploadBtn.onclick = () => fileInput.click();
+
+    fileInput.onchange = async (e) => {
+      const file = e.target.files[0];
+      if (!file) return;
+
+      const originalText = uploadBtn.textContent;
+      uploadBtn.disabled = true;
+      genBtn.disabled = true;
+
+      // Hide inputs and show progress
+      $('jd-input-box').style.display = 'none';
+      $('btn-row').style.display = 'none';
+      const infoBadge = $('info-container');
+      if (infoBadge) infoBadge.style.display = 'none';
+      
+      const prog = $('progress-container');
+      if (prog) prog.style.display = 'flex';
+      
+      updateProgress(10, 'Reading PDF file...');
+
+      try {
+        const reader = new FileReader();
+        const base64Promise = new Promise((resolve) => {
+          reader.onload = () => resolve(reader.result.split(',')[1]);
+        });
+        reader.readAsDataURL(file);
+        const pdfBase64 = await base64Promise;
+
+        updateProgress(45, 'Sending PDF to server...');
+        updateProgress(75, 'Parsing layout and extracting facts...');
+
+        chrome.runtime.sendMessage({ type: 'jw-upload-resume', pdfBase64 }, (res) => {
+          uploadBtn.disabled = false;
+          genBtn.disabled = false;
+          uploadBtn.textContent = originalText;
+
+          if (res && res.ok) {
+            updateProgress(100, `Import successful: ${res.name}!`);
+            
+            setTimeout(() => {
+              if (prog) prog.style.display = 'none';
+              $('jd-input-box').style.display = 'block';
+              $('btn-row').style.display = 'flex';
+              if (infoBadge) infoBadge.style.display = 'flex';
+              
+              setStatus(`Resume imported: ${res.name}`, false);
+              
+              const iframe = $('frame');
+              if (iframe && iframe.src) {
+                iframe.contentWindow.postMessage({ type: 'jw-reload' }, '*');
+              }
+            }, 1000);
+          } else {
+            if (prog) prog.style.display = 'none';
+            $('jd-input-box').style.display = 'block';
+            $('btn-row').style.display = 'flex';
+            if (infoBadge) infoBadge.style.display = 'flex';
+            
+            setStatus(res ? res.error : 'Failed to upload resume', false);
+          }
+        });
+      } catch (err) {
+        uploadBtn.disabled = false;
+        genBtn.disabled = false;
+        uploadBtn.textContent = originalText;
+        
+        if (prog) prog.style.display = 'none';
+        $('jd-input-box').style.display = 'block';
+        $('btn-row').style.display = 'flex';
+        if (infoBadge) infoBadge.style.display = 'flex';
+        
+        setStatus(err.message, false);
+      }
+    };
+
+    btnRow.append(genBtn, uploadBtn, fileInput);
+    card.append(btnRow);
 
     // Setup Recommendation Info Badge with hover tooltip
     const infoContainer = el('div', 'info-container');
+    infoContainer.id = 'info-container';
     infoContainer.innerHTML = `
       <span>Local server setup</span>
       <span class="info-icon">i</span>
@@ -674,20 +907,20 @@ h4{margin:0;font-size:11px;text-transform:uppercase;letter-spacing:.08em;color:#
     
     const errSetup = el('div', 'error-setup-info');
     errSetup.innerHTML = `
-      <div style="font-weight: 700; margin-bottom: 6px; color: #0f172a;">To start the local jobwire server:</div>
+      <div style="font-weight: 700; margin-bottom: 6px; color: #000;">To start the local fast-CV server:</div>
       <div style="margin-bottom: 4px;">1. Run in project directory:</div>
       <div class="tooltip-step">npm run dev</div>
       <div style="margin-bottom: 4px;">2. Ensure Ollama is running:</div>
       <div class="tooltip-step">ollama serve</div>
       <div style="margin-bottom: 4px;">3. Load your resume facts:</div>
-      <a href="http://127.0.0.1:7788/setup" target="_blank" style="color: #4f46e5; font-weight: 600; text-decoration: none;">http://127.0.0.1:7788/setup</a>
+      <a href="http://127.0.0.1:7788/setup" target="_blank" style="color: #000; font-weight: 600; text-decoration: underline;">http://127.0.0.1:7788/setup</a>
     `;
     
     const backBtn = el('button', 'btn-back', 'Back to Edit');
     backBtn.onclick = () => {
       errContainer.style.display = 'none';
       jdTextarea.style.display = 'block';
-      genBtn.style.display = 'block';
+      $('btn-row').style.display = 'flex';
       infoContainer.style.display = 'flex';
     };
     
@@ -723,10 +956,144 @@ h4{margin:0;font-size:11px;text-transform:uppercase;letter-spacing:.08em;color:#
     dl.id = 'dl'; dl.disabled = true; dl.onclick = onDownload;
     bot.append(status, el('div', 'grow'), save, dl);
 
-    box.append(top, inputView, main, bot);
+    const headerProg = el('div', 'header-progress-bar');
+    headerProg.id = 'header-progress';
+    const headerProgFill = el('div', 'header-progress-fill');
+    headerProgFill.id = 'header-progress-fill';
+    headerProg.append(headerProgFill);
+
+    box.append(top, headerProg, inputView, main, bot);
     wrap.append(box);
     root.append(wrap);
     document.documentElement.append(host);
+
+    // Inference Selector Modal
+    function showLlmModal(jdText) {
+      const existing = $('llm-modal');
+      if (existing) existing.remove();
+
+      const modal = el('div', 'llm-modal-overlay');
+      modal.id = 'llm-modal';
+
+      modal.append(el('div', 'llm-modal-title', 'Select Inference Source'));
+
+      const optionGroup = el('div', 'llm-option-group');
+      const localBtn = el('button', 'llm-opt-btn active', 'Local Inference');
+      const keyBtn = el('button', 'llm-opt-btn', 'Use API Key');
+      optionGroup.append(localBtn, keyBtn);
+      modal.append(optionGroup);
+
+      const form = el('div', 'llm-key-form');
+      form.style.display = 'none';
+
+      // Provider select
+      const providerField = el('div', 'llm-field');
+      providerField.append(el('label', 'llm-label', 'Provider'));
+      const providerSelect = el('select', 'llm-select');
+      const optGemini = el('option'); optGemini.value = 'gemini'; optGemini.textContent = 'Gemini';
+      const optOpenai = el('option'); optOpenai.value = 'openai'; optOpenai.textContent = 'OpenAI';
+      const optAnthropic = el('option'); optAnthropic.value = 'anthropic'; optAnthropic.textContent = 'Anthropic';
+      providerSelect.append(optGemini, optOpenai, optAnthropic);
+      providerField.append(providerSelect);
+
+      // API Key input
+      const keyField = el('div', 'llm-field');
+      keyField.append(el('label', 'llm-label', 'API Key'));
+      const keyInput = el('input', 'llm-input');
+      keyInput.type = 'password';
+      keyInput.placeholder = 'Enter API key...';
+      keyField.append(keyInput);
+
+      // Model input (optional)
+      const modelField = el('div', 'llm-field');
+      modelField.append(el('label', 'llm-label', 'Model (Optional)'));
+      const modelInput = el('input', 'llm-input');
+      modelInput.type = 'text';
+      modelInput.placeholder = 'Default model will be used...';
+      modelField.append(modelInput);
+
+      form.append(providerField, keyField, modelField);
+      modal.append(form);
+
+      // Actions
+      const actions = el('div', 'llm-actions');
+      const cancelBtn = el('button', 'llm-action-btn secondary', 'Cancel');
+      const confirmBtn = el('button', 'llm-action-btn primary', 'Confirm & Generate');
+      actions.append(cancelBtn, confirmBtn);
+      modal.append(actions);
+
+      card.append(modal);
+
+      chrome.storage.local.get(['llmType', 'llmProvider', 'llmApiKey', 'llmModel'], (res) => {
+        if (res.llmType === 'key') {
+          keyBtn.click();
+        } else {
+          localBtn.click();
+        }
+        if (res.llmProvider) providerSelect.value = res.llmProvider;
+        if (res.llmApiKey) keyInput.value = res.llmApiKey;
+        if (res.llmModel) modelInput.value = res.llmModel;
+        updatePlaceholder();
+      });
+
+      function updatePlaceholder() {
+        if (providerSelect.value === 'gemini') {
+          modelInput.placeholder = 'gemini-3.6-flash';
+        } else if (providerSelect.value === 'openai') {
+          modelInput.placeholder = 'gpt-4o-mini';
+        } else if (providerSelect.value === 'anthropic') {
+          modelInput.placeholder = 'claude-3-5-haiku-20241022';
+        }
+      }
+
+      providerSelect.onchange = updatePlaceholder;
+
+      localBtn.onclick = () => {
+        localBtn.classList.add('active');
+        keyBtn.classList.remove('active');
+        form.style.display = 'none';
+      };
+
+      keyBtn.onclick = () => {
+        keyBtn.classList.add('active');
+        localBtn.classList.remove('active');
+        form.style.display = 'flex';
+      };
+
+      cancelBtn.onclick = () => {
+        modal.remove();
+      };
+
+      confirmBtn.onclick = async () => {
+        const type = localBtn.classList.contains('active') ? 'local' : 'key';
+        const provider = providerSelect.value;
+        const apiKey = keyInput.value.trim();
+        const model = modelInput.value.trim();
+
+        if (type === 'key' && !apiKey) {
+          alert('API Key is required to use key-based inference.');
+          return;
+        }
+
+        await chrome.storage.local.set({
+          llmType: type,
+          llmProvider: provider,
+          llmApiKey: apiKey,
+          llmModel: model
+        });
+
+        modal.remove();
+
+        jdTextarea.style.display = 'none';
+        $('btn-row').style.display = 'none';
+        infoContainer.style.display = 'none';
+        errContainer.style.display = 'none';
+        progContainer.style.display = 'flex';
+        updateProgress(0, 'Initializing inference...');
+        
+        start(jdText, false, type === 'key' ? { provider, apiKey, model } : {});
+      };
+    }
 
     // Generate click handler
     genBtn.onclick = () => {
@@ -735,13 +1102,7 @@ h4{margin:0;font-size:11px;text-transform:uppercase;letter-spacing:.08em;color:#
         alert('Job description too short to work with (must be at least 80 characters).');
         return;
       }
-      jdTextarea.style.display = 'none';
-      genBtn.style.display = 'none';
-      infoContainer.style.display = 'none';
-      errContainer.style.display = 'none';
-      progContainer.style.display = 'flex';
-      updateProgress(0, 'Initializing inference...');
-      start(jdText, false);
+      showLlmModal(jdText);
     };
 
     wrap.addEventListener('click', (e) => { if (e.target === wrap) close(); });
@@ -835,16 +1196,27 @@ h4{margin:0;font-size:11px;text-transform:uppercase;letter-spacing:.08em;color:#
     redo.style.marginTop = '8px';
     redo.style.width = '100%';
     redo.onclick = () => {
+      isExtended = false;
+      showEditor = false;
+      const wrap = root.querySelector('.wrap');
+      wrap.classList.remove('extended');
+      wrap.classList.add('collapsed');
+      const extendBtn = $('extend-btn');
+      if (extendBtn) extendBtn.innerHTML = EXTEND_SVG;
+
       $('main-view').style.display = 'none';
       $('bot-view').style.display = 'none';
       $('input-view').style.display = 'flex';
       $('jd-input-box').value = ta.value;
       $('jd-input-box').style.display = 'none';
-      $('gen-btn').style.display = 'none';
+      $('btn-row').style.display = 'none';
       $('complete-container').style.display = 'none';
       $('progress-container').style.display = 'flex';
       updateProgress(0, 'Re-running inference...');
-      start(ta.value, true);
+      chrome.storage.local.get(['llmType', 'llmProvider', 'llmApiKey', 'llmModel'], (res) => {
+        const llmOpts = res.llmType === 'key' ? { provider: res.llmProvider, apiKey: res.llmApiKey, model: res.llmModel } : {};
+        start(ta.value, true, llmOpts);
+      });
     };
 
     details.append(summary, ta, redo);
@@ -879,47 +1251,167 @@ h4{margin:0;font-size:11px;text-transform:uppercase;letter-spacing:.08em;color:#
     chrome.runtime.sendMessage({ type: 'jw-download', runId }, () => setStatus('downloaded', false));
   }
 
-  function start(jdText, isRerun) {
+  function start(jdText, isRerun, llmOpts = {}) {
     runId = null;
     $('save').disabled = true;
     $('dl').disabled = true;
+    
+    // We keep the modal collapsed during progress streaming.
+    let isGemini = !!llmOpts.provider ? llmOpts.provider.toLowerCase() === 'gemini' : false;
+    let modelName = llmOpts.provider ? llmOpts.provider : 'Ollama';
+    
     updateProgress(5, 'Reading job description...');
 
-    port = chrome.runtime.connect({ name: 'jobwire' });
+    if (!llmOpts.provider) {
+      chrome.runtime.sendMessage({ type: 'jw-health' }, (res) => {
+        if (res && res.ok && res.health && res.health.ollama) {
+          isGemini = !!res.health.ollama.isGemini;
+          modelName = isGemini ? 'Gemini' : 'Ollama';
+        }
+      });
+    }
+
+    const headerProg = $('header-progress');
+    if (headerProg) headerProg.style.display = 'block';
+
+    let currentRunState = null;
+    let frameLoaded = false;
+    const frame = $('frame');
+
+    async function refreshPreview(runState) {
+      if (!runState) return;
+      const fontBase = chrome.runtime.getURL('fonts').replace(/\/$/, '');
+      chrome.runtime.sendMessage({ type: 'jw-base' }, async (res) => {
+        const base = res?.base || 'http://127.0.0.1:7788';
+        try {
+          const res = await fetch(`${base}/preview/parts?edit=1&fonts=${encodeURIComponent(fontBase)}`, {
+            method: 'POST',
+            headers: { 'content-type': 'application/json' },
+            body: JSON.stringify(runState),
+          });
+          if (res.ok) {
+            const parts = await res.json();
+            frame.contentWindow.postMessage({ type: 'jw-update', parts, run: runState }, '*');
+          }
+        } catch (e) {
+          console.error('Error updating preview', e);
+        }
+      });
+    }
+
+    chrome.runtime.sendMessage({ type: 'jw-base' }, async (res) => {
+      const base = res?.base || 'http://127.0.0.1:7788';
+      frame.src = `${chrome.runtime.getURL('preview.html')}?run=stream&base=${encodeURIComponent(base)}`;
+      
+      frame.onload = () => {
+        frameLoaded = true;
+        if (currentRunState) {
+          refreshPreview(currentRunState);
+        }
+      };
+
+      try {
+        const r = await fetch(`${base}/facts`);
+        if (r.ok) {
+          currentRunState = await r.json();
+          if (frameLoaded) {
+            refreshPreview(currentRunState);
+          }
+        }
+      } catch (e) {
+        console.error('Failed to fetch facts', e);
+      }
+    });
+
+    port = chrome.runtime.connect({ name: 'fast-cv' });
+    const pingInterval = setInterval(() => {
+      try {
+        port.postMessage({ type: 'ping' });
+      } catch (e) {
+        clearInterval(pingInterval);
+      }
+    }, 10000);
+
+    port.onDisconnect.addListener(() => {
+      clearInterval(pingInterval);
+    });
+
     port.onMessage.addListener((ev) => {
       if (ev.type === 'status') {
+        let percent = 5;
         if (ev.stage === 'reading-jd') {
-          updateProgress(8, 'Reading job description (Loading Ollama model - can take up to 60s)...');
+          percent = 10;
+          const modelInfo = isGemini ? 'Gemini' : (llmOpts.provider ? llmOpts.provider : 'Ollama - can take up to 60s');
+          updateProgress(10, `Reading job description (Loading ${modelInfo} model)...`);
         } else if (ev.stage.startsWith('tailoring')) {
           const detail = ev.stage.replace('tailoring section ', 'Tailoring ');
           const done = ev.done || 0;
           const total = ev.total || 1;
-          const percent = 15 + Math.round((done / total) * 75);
-          updateProgress(percent, `${detail} (running Ollama)...`);
+          percent = Math.round(20 + (done / total) * 70);
+          updateProgress(percent, `${detail} (running ${modelName})...`);
         } else if (ev.stage === 'verifying') {
+          percent = 95;
           updateProgress(95, 'Verifying formatting and facts...');
         } else {
+          percent = 10;
           updateProgress(10, ev.stage);
         }
-        setStatus(ev.stage, true);
+        setStatus(`${ev.stage} (${percent}%)`, true);
       }
       if (ev.type === 'warn') {
         setStatus(`${ev.section} kept as-is (${ev.error})`, true);
       }
       if (ev.type === 'jd') {
+        updateProgress(20, 'Job description parsed. Starting tailoring...');
         lastData.jd = ev.jd;
         $('role').textContent = `${ev.jd.title || 'this role'}${ev.jd.company ? ` · ${ev.jd.company}` : ''}`;
         renderPanel(lastData);
+        if (currentRunState) {
+          currentRunState.jd = ev.jd;
+          refreshPreview(currentRunState);
+        }
       }
       if (ev.type === 'section') {
-        const percent = 15 + Math.round((ev.done / ev.total) * 75);
+        const percent = Math.round(20 + (ev.done / ev.total) * 70);
         updateProgress(percent, `Tailored ${ev.label} (${ev.done}/${ev.total})`);
-        setStatus(`${ev.label} (${ev.done}/${ev.total})`, true);
+        setStatus(`${ev.label} (${ev.done}/${ev.total}) (${percent}%)`, true);
+        
+        if (currentRunState) {
+          currentRunState[ev.key] = ev.value;
+          refreshPreview(currentRunState);
+        }
       }
       if (ev.type === 'error') {
+        clearInterval(pingInterval);
+        if (headerProg) headerProg.style.display = 'none';
         setStatus(ev.error, false);
         $('progress-container').style.display = 'none';
         $('error-msg-text').textContent = ev.error;
+
+        const errSetup = $('error-setup-info');
+        if (errSetup) {
+          if (isGemini || llmOpts.provider) {
+            errSetup.innerHTML = `
+              <div style="font-weight: 700; margin-bottom: 6px; color: #000;">To start the local fast-CV server:</div>
+              <div style="margin-bottom: 4px;">1. Run in project directory:</div>
+              <div class="tooltip-step">npm run dev</div>
+              <div style="margin-bottom: 4px;">2. Ensure API keys are configured correctly</div>
+              <div style="margin-bottom: 4px;">3. Load your resume facts:</div>
+              <a href="http://127.0.0.1:7788/setup" target="_blank" style="color: #000; font-weight: 600; text-decoration: underline;">http://127.0.0.1:7788/setup</a>
+            `;
+          } else {
+            errSetup.innerHTML = `
+              <div style="font-weight: 700; margin-bottom: 6px; color: #000;">To start the local fast-CV server:</div>
+              <div style="margin-bottom: 4px;">1. Run in project directory:</div>
+              <div class="tooltip-step">npm run dev</div>
+              <div style="margin-bottom: 4px;">2. Ensure Ollama is running:</div>
+              <div class="tooltip-step">ollama serve</div>
+              <div style="margin-bottom: 4px;">3. Load your resume facts:</div>
+              <a href="http://127.0.0.1:7788/setup" target="_blank" style="color: #000; font-weight: 600; text-decoration: underline;">http://127.0.0.1:7788/setup</a>
+            `;
+          }
+        }
+
         $('error-container').style.display = 'flex';
         
         if (/no resume imported/.test(ev.error)) {
@@ -929,29 +1421,33 @@ h4{margin:0;font-size:11px;text-transform:uppercase;letter-spacing:.08em;color:#
         }
       }
       if (ev.type === 'done') {
+        clearInterval(pingInterval);
+        updateProgress(100, 'Tailoring complete');
+
+        if (headerProg) headerProg.style.display = 'none';
         runId = ev.runId;
         lastData = { ...lastData, jd: ev.run.jd, gaps: ev.run.gaps, verification: ev.run.verification, jdText };
         renderPanel(lastData);
-        chrome.runtime.sendMessage({ type: 'jw-base' }, ({ base }) => {
+        chrome.runtime.sendMessage({ type: 'jw-base' }, (res) => {
+          const base = res?.base || 'http://127.0.0.1:7788';
           $('frame').src = `${chrome.runtime.getURL('preview.html')}?run=${ev.runId}&base=${encodeURIComponent(base)}`;
         });
         $('save').disabled = false;
         $('dl').disabled = false;
         setStatus('ready — click any line to edit it', false);
         
-        updateProgress(100, 'Tailoring complete');
         $('progress-container').style.display = 'none';
         $('complete-container').style.display = 'flex';
       }
     });
     port.postMessage({
       type: 'tailor',
-      payload: { jdText, url: location.href, title: document.title },
+      payload: { jdText, url: location.href, title: document.title, ...llmOpts },
     });
     if (isRerun) lastData.jdText = jdText;
   }
 
-  window.__jobwireOpen = () => {
+  window.__fastCvOpen = () => {
     if (host) return;
     build();
     window.addEventListener('message', onFrameMessage);
@@ -965,8 +1461,8 @@ h4{margin:0;font-size:11px;text-transform:uppercase;letter-spacing:.08em;color:#
   };
 
   chrome.runtime.onMessage.addListener((msg) => {
-    if (msg.type === 'jw-open') window.__jobwireOpen();
+    if (msg.type === 'jw-open') window.__fastCvOpen();
   });
 
-  window.__jobwireOpen();
+  window.__fastCvOpen();
 })();

@@ -28,7 +28,7 @@ function findChrome() {
 // never opens a print dialog is the whole point, so render server-side too.
 function htmlToPdf(html) {
   return new Promise((resolve, reject) => {
-    const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'jobwire-'));
+    const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'fast-cv-'));
     const htmlFile = path.join(dir, 'resume.html');
     const pdfFile = path.join(dir, 'resume.pdf');
     fs.writeFileSync(htmlFile, html);
